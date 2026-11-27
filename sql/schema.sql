@@ -5,6 +5,8 @@ CREATE TABLE regiao_turistica (
   nome varchar(80) NOT NULL UNIQUE,
   perfil varchar(20) NOT NULL CHECK (perfil IN ('cultural','natureza')),
   capacidade integer NOT NULL CHECK (capacidade > 0),
+  area_km2 numeric(8,3) NOT NULL CHECK (area_km2 > 0),
+  ano_criacao smallint NOT NULL CHECK (ano_criacao BETWEEN 1900 AND 2026),
   geom geometry(Polygon,4674) NOT NULL CHECK (ST_IsValid(geom) AND NOT ST_IsEmpty(geom))
 );
 CREATE INDEX regiao_turistica_geom_idx ON regiao_turistica USING GIST (geom);

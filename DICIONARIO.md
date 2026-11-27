@@ -26,11 +26,13 @@
 | Rotas por região | 2: a rota 1 liga as atrações da fila de baixo; a rota 2, as da fila de cima (5 vértices cada) |
 | `perfil` | `cultural` para regiões de id ímpar; `natureza` para id par |
 | `capacidade` | 100 × `id_regiao` (100 a 5.000) |
+| `area_km2` | Calculada da geometria: `ST_Area(ST_Transform(geom, 31983)) / 1.000.000`, arredondada a 3 casas |
+| `ano_criacao` | 2000 + (`id_regiao` mod 25), de 2000 a 2024 |
 | `categoria` | Cíclica pela posição j (1 a 10) da atração na região: museu, parque, mirante, museu… |
 | `visitantes_dia` | 20 × j (20 a 200) |
 | `modalidade` / `duracao_min` | Rota 1: caminhada, 30 min; rota 2: bicicleta, 60 min |
 
-Medidas resultantes, obtidas por `sql/consultas.sql` em EPSG:31983: cada região tem entre 4,632 e 4,635 km²; cada rota tem entre 1.255,48 e 1.256,25 m. A variação vem apenas da posição na projeção UTM.
+Medidas resultantes em EPSG:31983: cada região tem entre 4,632 e 4,635 km² (coluna `area_km2`); cada rota tem entre 1.255,48 e 1.256,25 m. A variação vem apenas da posição na projeção UTM.
 
 ## 2. Descrição das tabelas
 
@@ -43,6 +45,8 @@ Células de estudo artificiais. **Geometria:** Polygon · **SRID:** 4674 · **Re
 | nome | varchar | 80, único | Não | — | Nome simulado da região | Região 01 |
 | perfil | varchar | 20 · ver seção 4 | Não | — | Perfil turístico predominante | cultural |
 | capacidade | integer | > 0 | Não | — | Capacidade hipotética de visitantes por dia | 100 |
+| area_km2 | numeric | (8,3) · > 0 | Não | — | Área da região em km², calculada da geometria em EPSG:31983 | 4.632 |
+| ano_criacao | smallint | 1900 a 2026 | Não | — | Ano hipotético de criação da região turística | 2001 |
 | geom | geometry | Polygon, 4674 | Não | — | Limite da célula; válido e não vazio | `POLYGON((-44 -20,-44 -19.98,-43.98 -19.98,-43.98 -20,-44 -20))` |
 
 ### Tabela `ponto_turistico`

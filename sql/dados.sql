@@ -2,10 +2,13 @@
 SET client_encoding = 'UTF8';
 BEGIN;
 -- Grade artificial de 10 colunas por 5 linhas, na área de referência central de MG.
-INSERT INTO regiao_turistica
+-- area_km2 é calculada da própria geometria em SIRGAS 2000 / UTM 23S (31983).
+INSERT INTO regiao_turistica (id_regiao,nome,perfil,capacidade,area_km2,ano_criacao,geom)
 SELECT i, 'Região ' || lpad(i::text,2,'0'), CASE WHEN i%2=1 THEN 'cultural' ELSE 'natureza' END, 100*i,
- ST_MakeEnvelope(x,y,x+0.02,y+0.02,4674)
-FROM (SELECT i, -44.0+((i-1)%10)*0.02 AS x, -20.0+((i-1)/10)*0.02 AS y FROM generate_series(1,50) i) g;
+ round((ST_Area(ST_Transform(e,31983))/1e6)::numeric,3), 2000+(i%25), e
+FROM (SELECT i, ST_MakeEnvelope(-44.0+((i-1)%10)*0.02, -20.0+((i-1)/10)*0.02,
+                                -44.0+((i-1)%10)*0.02+0.02, -20.0+((i-1)/10)*0.02+0.02, 4674) AS e
+      FROM generate_series(1,50) i) g;
 INSERT INTO ponto_turistico
 SELECT (r.id_regiao-1)*10+j,r.id_regiao,'Atração '||lpad(((r.id_regiao-1)*10+j)::text,3,'0'),
  (ARRAY['museu','parque','mirante'])[(j-1)%3+1],20*j,
